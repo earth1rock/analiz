@@ -1,0 +1,10 @@
+J:\ИнстрСредства ИС\Курсовик\Kursovik\Kursovik\bin\Debug\Kursovik.exe.config
+J:\ИнстрСредства ИС\Курсовик\Kursovik\Kursovik\bin\Debug\Kursovik.exe
+J:\ИнстрСредства ИС\Курсовик\Kursovik\Kursovik\bin\Debug\Kursovik.pdb
+J:\ИнстрСредства ИС\Курсовик\Kursovik\Kursovik\obj\Debug\Kursovik.csprojAssemblyReference.cache
+J:\ИнстрСредства ИС\Курсовик\Kursovik\Kursovik\obj\Debug\Kursovik.Form1.resources
+J:\ИнстрСредства ИС\Курсовик\Kursovik\Kursovik\obj\Debug\Kursovik.Properties.Resources.resources
+J:\ИнстрСредства ИС\Курсовик\Kursovik\Kursovik\obj\Debug\Kursovik.csproj.GenerateResource.cache
+J:\ИнстрСредства ИС\Курсовик\Kursovik\Kursovik\obj\Debug\Kursovik.csproj.CoreCompileInputs.cache
+J:\ИнстрСредства ИС\Курсовик\Kursovik\Kursovik\obj\Debug\Kursovik.exe
+J:\ИнстрСредства ИС\Курсовик\Kursovik\Kursovik\obj\Debug\Kursovik.pdb
