@@ -20,54 +20,121 @@ namespace Kursovik
             InitializeComponent();
         }
 
-
-        private void button1_Click(object sender, EventArgs e)
+        //метод для обработки неправильно введенных данных
+        private bool checkError()
         {
+
             for (int i = 0; i < dataGridView1.Rows.Count; i++)
             {
                 //парсим x и y
-                double x = Convert.ToDouble(dataGridView1.Rows[i].Cells[0].Value);
-                double y = Convert.ToDouble(dataGridView1.Rows[i].Cells[1].Value);
-
-                // x^2
-                dataGridView1.Rows[i].Cells[2].Value = Math.Round(Math.Pow(x, 2), 2);
-
-                // y^2
-                dataGridView1.Rows[i].Cells[3].Value = Math.Round(Math.Pow(y, 2), 2);
-
-                // x*y
-                dataGridView1.Rows[i].Cells[4].Value = Math.Round(x * y, 2);
+                try
+                {
+                    double x = Convert.ToDouble(dataGridView1.Rows[i].Cells[0].Value);
+                    double y = Convert.ToDouble(dataGridView1.Rows[i].Cells[1].Value);
+                }
+                catch (FormatException err)
+                {
+                    MessageBox.Show("Неверный формат входных данных!\n\rНа строке №" + Convert.ToString(i + 1));
+                    return false;
+                }
             }
-
-            //количество входных данных
-            int countFirst = dataGridView1.Rows.Count;
-
-            //сумма столбцов 
-            double sumX = 0,
-                    sumY = 0,
-                    sumX2 = 0,
-                    sumY2 = 0,
-                    sumXY = 0;
-
-            for (int i = 0; i < countFirst; i++)
-            {
-                sumX += Convert.ToDouble(dataGridView1.Rows[i].Cells[0].Value);
-                sumY += Convert.ToDouble(dataGridView1.Rows[i].Cells[1].Value);
-                sumX2 += Convert.ToDouble(dataGridView1.Rows[i].Cells[2].Value);
-                sumY2 += Convert.ToDouble(dataGridView1.Rows[i].Cells[3].Value);
-                sumXY += Convert.ToDouble(dataGridView1.Rows[i].Cells[4].Value);
-            }
-
-            dt.Rows.Add(sumX, sumY, sumX2, sumY2, sumXY);
-            dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Σ";
-
-            dt.Rows.Add(Math.Round(sumX / countFirst, 2), Math.Round(sumY / countFirst, 2), Math.Round(sumX2 / countFirst, 2),
-                Math.Round(sumY2 / countFirst, 2), Math.Round(sumXY / countFirst, 2));
-            dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Средняя \r\nвеличина";
-
-
+            return true;
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (checkError())
+            {
+                for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                {
+
+                    double x = Convert.ToDouble(dataGridView1.Rows[i].Cells[0].Value);
+                    double y = Convert.ToDouble(dataGridView1.Rows[i].Cells[1].Value);
+
+                    // x^2
+                    dataGridView1.Rows[i].Cells[2].Value = Math.Round(Math.Pow(x, 2), 2);
+
+                    // y^2
+                    dataGridView1.Rows[i].Cells[3].Value = Math.Round(Math.Pow(y, 2), 2);
+
+                    // x*y
+                    dataGridView1.Rows[i].Cells[4].Value = Math.Round(x * y, 2);
+
+                }
+
+                //количество входных данных
+                int countFirst = dataGridView1.Rows.Count;
+
+                //сумма столбцов 
+                double sumX = 0,
+                        sumY = 0,
+                        sumX2 = 0,
+                        sumY2 = 0,
+                        sumXY = 0;
+
+                for (int i = 0; i < countFirst; i++)
+                {
+                    sumX += Convert.ToDouble(dataGridView1.Rows[i].Cells[0].Value);
+                    sumY += Convert.ToDouble(dataGridView1.Rows[i].Cells[1].Value);
+                    sumX2 += Convert.ToDouble(dataGridView1.Rows[i].Cells[2].Value);
+                    sumY2 += Convert.ToDouble(dataGridView1.Rows[i].Cells[3].Value);
+                    sumXY += Convert.ToDouble(dataGridView1.Rows[i].Cells[4].Value);
+                }
+
+                //добавление строки с суммами
+                dt.Rows.Add(sumX, sumY, sumX2, sumY2, sumXY);
+                dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Σ";
+
+                //добавление строки с средними величинами
+                dt.Rows.Add(Math.Round(sumX / countFirst, 2), Math.Round(sumY / countFirst, 2), Math.Round(sumX2 / countFirst, 2),
+                    Math.Round(sumY2 / countFirst, 2), Math.Round(sumXY / countFirst, 2));
+                dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Средняя \r\nвеличина";
+
+                //добавление строки с средними квадратическими отклонениями для признаков x и y соответственно
+                double kvX = Math.Round(Math.Sqrt(sumX2 / countFirst - Math.Pow(sumX / countFirst, 2)), 2);
+                double kvY = Math.Round(Math.Sqrt(sumY2 / countFirst - Math.Pow(sumY / countFirst, 2)), 2);
+                dt.Rows.Add(kvX, kvY);
+                dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Средние \r\nотклонения";
+
+                //линейный коэффициент корреляции
+                double avgXY = sumXY / countFirst;
+                double koef_korr = (avgXY - (sumX / countFirst) * (sumY / countFirst)) / (kvX * kvY);
+                string koefMsg = "",
+                       koefZnak = "";
+
+                if (koef_korr == 0)
+                {
+                    koefMsg = "Связь отсутствует";
+                }
+                if ((Math.Abs(koef_korr) > 0) && (Math.Abs(koef_korr) < 0.3))
+                {
+                    koefMsg = "Слабая";
+                }
+                if ((Math.Abs(koef_korr) >= 0.3) && (Math.Abs(koef_korr) <= 0.7))
+                {
+                    koefMsg = "Средней силы";
+                }
+                if ((Math.Abs(koef_korr) > 0.7) && (Math.Abs(koef_korr) < 1))
+                {
+                    koefMsg = "Сильная";
+                }
+                if (koef_korr == 1)
+                {
+                    koefMsg = "Функциональная";
+                }
+                if ((koef_korr > 0) && (koef_korr < 1))
+                {
+                    koefZnak = "Прямая";
+                }
+                if ((koef_korr < 0) && (koef_korr > -1))
+                {
+                    koefZnak += "Обратная";
+                }
+                dt.Rows.Add(Math.Round(koef_korr, 2), koefMsg, koefZnak);
+                dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Коэффициент \r\nкорреляции";
+
+            }
+        }
         private void Form1_Load(object sender, EventArgs e)
         {
             dt.Columns.Add("x");
@@ -105,9 +172,10 @@ namespace Kursovik
                     }
 
                     dt.Rows.Add(row);
-
+                    dataGridView1.Rows[dataGridView1.Rows.Count-1].HeaderCell.Value = Convert.ToString(i+1);
                 }
-            }
+                checkError();
+            }      
         }
     }
 }
