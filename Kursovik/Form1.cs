@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Kursovik
 {
@@ -135,7 +136,20 @@ namespace Kursovik
                     koefZnak += "Обратная";
                 }
                 dt.Rows.Add(Math.Round(koef_korr, 2), koefMsg, koefZnak);
-                dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Коэффициент \r\nкорреляции";
+                dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Коэффициент \r\nкорреляции,\r\nr";
+
+                //ошибка коэфф корреляции m
+                double errKoefKorr = Math.Round(Math.Abs(koef_korr/Math.Sqrt((1 - Math.Round(koef_korr * koef_korr, 2)) / (countFirst - 2))), 2);
+                dt.Rows.Add(errKoefKorr);
+                dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Критерий \r\nдоверенности,\r\nt";
+
+                //метод для получения Критерия Стюдента
+                //____________________________________ какой уровень значимости выбрать не знаю (выбрал как в лекциях - 0,05)
+                Chart chart1 = new Chart();
+                double koef_znach = 0.05;
+                double t_tabl = Math.Round(chart1.DataManipulator.Statistics.InverseTDistribution(koef_znach, countFirst - 2), 2);
+                dt.Rows.Add(t_tabl,koef_znach);
+                dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Критерий \r\nСтьюдента,\r\nпри коэффициенте значимости";
 
             }
         }
