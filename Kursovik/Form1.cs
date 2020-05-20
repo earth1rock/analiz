@@ -48,8 +48,9 @@ namespace Kursovik
 
         private void button1_Click(object sender, EventArgs e)
         {
+            
             if (checkError())
-            {
+            {               
                 for (int i = 0; i < dataGridView1.Rows.Count; i++)
                 {
 
@@ -151,6 +152,20 @@ namespace Kursovik
                 dt.Rows.Add(t_tabl,koef_znach);
                 dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Критерий \r\nСтьюдента,\r\nпри коэффициенте значимости";
 
+                //делаем вывод после сравнения ошибки с Стюдента
+                string vivod_korr = "Коэфф ошибки корреляции и Стюдента совпадают";
+
+                if (errKoefKorr>t_tabl)
+                {
+                    vivod_korr = "Связь присутствует";
+                }
+                if (errKoefKorr<t_tabl)
+                {
+                    vivod_korr = "Связь случайна";
+                }
+                dt.Rows.Add(vivod_korr);
+                dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Вывод \r\nо значимости коэффициента корреляции";
+
             }
         }
         private void Form1_Load(object sender, EventArgs e)
@@ -170,6 +185,7 @@ namespace Kursovik
 
         private void открытьToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            dt.Clear();
             OpenFileDialog file = new OpenFileDialog();
             if (file.ShowDialog() == DialogResult.OK)
             {
