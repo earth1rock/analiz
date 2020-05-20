@@ -35,6 +35,10 @@ namespace Kursovik
                 catch (FormatException err)
                 {
                     MessageBox.Show("Неверный формат входных данных!\n\rНа строке №" + Convert.ToString(i + 1));
+                    //фокус курсора на строке с неверными данными
+                    dataGridView1.ClearSelection();
+                    dataGridView1.Rows[i].Selected = true;
+                    dataGridView1.CurrentCell = dataGridView1[0, i];
                     return false;
                 }
             }
