@@ -92,8 +92,12 @@ namespace Kursovik
                 dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Σ";
 
                 //добавление строки с средними величинами
-                dt.Rows.Add(Math.Round(sumX / countFirst, 2), Math.Round(sumY / countFirst, 2), Math.Round(sumX2 / countFirst, 2),
-                    Math.Round(sumY2 / countFirst, 2), Math.Round(sumXY / countFirst, 2));
+                double avgX = Math.Round(sumX / countFirst, 2),
+                       avgY = Math.Round(sumY / countFirst, 2),
+                       avgX2 = Math.Round(sumX2 / countFirst, 2),
+                       avgY2 = Math.Round(sumY2 / countFirst, 2),
+                       avgXY = Math.Round(sumXY / countFirst, 2);
+                dt.Rows.Add(avgX, avgY, avgX2, avgY2, avgXY);
                 dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Средняя \r\nвеличина";
 
                 //добавление строки с средними квадратическими отклонениями для признаков x и y соответственно
@@ -103,7 +107,6 @@ namespace Kursovik
                 dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Средние \r\nотклонения";
 
                 //линейный коэффициент корреляции
-                double avgXY = sumXY / countFirst;
                 double koef_korr = (avgXY - (sumX / countFirst) * (sumY / countFirst)) / (kvX * kvY);
                 string koefMsg = "",
                        koefZnak = "";
@@ -165,6 +168,9 @@ namespace Kursovik
                 }
                 dt.Rows.Add(vivod_korr);
                 dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Вывод \r\nо значимости коэффициента корреляции";
+
+
+
 
             }
         }
