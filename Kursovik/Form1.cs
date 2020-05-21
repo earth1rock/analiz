@@ -171,7 +171,29 @@ namespace Kursovik
 
 
 
+                //рисование графика
+                double[] testoviedataX = new double[countFirst];
+                double[] testoviedataY = new double[countFirst];
 
+                chart2.Series["Series1"].ChartType = SeriesChartType.Point;
+                chart2.Series.Add("line");
+                chart2.Series["line"].ChartType = SeriesChartType.Line;
+                for (int i = 0; i < countFirst; i++)
+                {
+                    testoviedataX[i] = Convert.ToDouble(dataGridView1.Rows[i].Cells[0].Value);
+                    testoviedataY[i] = Convert.ToDouble(dataGridView1.Rows[i].Cells[1].Value);
+                    label1.Text += Convert.ToString(testoviedataX[i]) + "  " + Convert.ToString(testoviedataY[i]) + "\r\n";                    
+                    chart2.Series["Series1"].Points.AddXY(testoviedataX[i],testoviedataY[i]);                   
+              
+                }
+
+
+                //поиск коэфф регрессии
+                double b = Math.Round((countFirst * sumXY - sumX * sumY) / (countFirst * sumX2 - sumX * sumX), 2);
+                label1.Text = Convert.ToString(b) + "\r\n";
+
+                double a = Math.Round(avgY - b * avgX, 2);
+                label1.Text += Convert.ToString(a);
             }
         }
         private void Form1_Load(object sender, EventArgs e)
