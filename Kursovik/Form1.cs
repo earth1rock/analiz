@@ -208,6 +208,50 @@ namespace Kursovik
             //выбираем тип диаграммы линейный
             chart2.Series.Add("line");
             chart2.Series["line"].ChartType = SeriesChartType.Line;
+
+            //разрешение зума
+            chart2.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
+            chart2.ChartAreas[0].AxisY.ScaleView.Zoomable = true;
+            //связывание обработчика
+            chart2.MouseWheel += chart2_MouseWheel;
+        }
+  
+        //зумм графика + ресет
+        private void chart2_MouseWheel(object sender, MouseEventArgs e)
+        {
+            var chart = (Chart)sender;
+            var xAxis = chart.ChartAreas[0].AxisX;
+            var yAxis = chart.ChartAreas[0].AxisY;
+
+            try
+            {
+                if (e.Delta < 0) // Если скролим вниз, то сбрасываем зум
+                {
+                    xAxis.ScaleView.ZoomReset();
+                    yAxis.ScaleView.ZoomReset();
+                }
+                else if (e.Delta > 0) // Если скролим вверх, то зумим
+                {
+                    //получаем координаты начала и конца осей
+                    var xMin = xAxis.ScaleView.ViewMinimum;
+                    var xMax = xAxis.ScaleView.ViewMaximum;
+                    var yMin = yAxis.ScaleView.ViewMinimum;
+                    var yMax = yAxis.ScaleView.ViewMaximum;
+
+                    //находим новые координаты для осей (с учетом положения курсора (куда наведешь - туда и зазумишь))
+                    var posXStart = Math.Round(xAxis.PixelPositionToValue(e.Location.X) - (xMax - xMin) / 2, 2);
+                    var posXFinish = Math.Round(xAxis.PixelPositionToValue(e.Location.X) + (xMax - xMin) / 2, 2);
+                    var posYStart = Math.Round(yAxis.PixelPositionToValue(e.Location.Y) - (yMax - yMin) / 2, 2);
+                    var posYFinish = Math.Round(yAxis.PixelPositionToValue(e.Location.Y) + (yMax - yMin) / 2, 2);
+
+                    //зум
+                    xAxis.ScaleView.Zoom(posXStart, posXFinish);
+                    yAxis.ScaleView.Zoom(posYStart, posYFinish);
+                    
+                }
+            }
+            //пустышка катч
+            catch { }
         }
 
         private void выходToolStripMenuItem_Click(object sender, EventArgs e)
