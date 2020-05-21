@@ -16,9 +16,11 @@ namespace Kursovik
     public partial class Form1 : Form
     {
         DataTable dt = new DataTable();
+        Boolean check_click = false;
         public Form1()
         {
             InitializeComponent();
+            
         }
 
         //метод для обработки неправильно введенных данных
@@ -212,12 +214,47 @@ namespace Kursovik
             //разрешение зума
             chart2.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
             chart2.ChartAreas[0].AxisY.ScaleView.Zoomable = true;
-            //связывание обработчика
+            //связывание обработчика для зума
             chart2.MouseWheel += chart2_MouseWheel;
+
+            //зачинки для перемещения скроллов
+            chart2.MouseDown += chart2_MouseDown;
+            chart2.MouseMove += Chart2_MouseMove;
+            chart2.MouseUp += Chart2_MouseUp;
         }
-  
-        //зумм графика + ресет
-        private void chart2_MouseWheel(object sender, MouseEventArgs e)
+
+        private void Chart2_MouseUp(object sender, MouseEventArgs e)
+        {
+            check_click = false;
+        }
+
+        private void Chart2_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (check_click)
+            {
+                var chart = (Chart)sender;
+                var xAxis = chart.ChartAreas[0].AxisX;
+                var yAxis = chart.ChartAreas[0].AxisY;
+
+                label1.Text = Convert.ToString(e.Location.X) + "  " + Convert.ToString(chart.Width);
+                
+              //  xAxis.ScaleView.Scroll()
+            }
+        }
+
+        private void chart2_MouseDown(object sender, MouseEventArgs e)
+        {
+            var chart = (Chart)sender;
+            var xAxis = chart.ChartAreas[0].AxisX;
+            var yAxis = chart.ChartAreas[0].AxisY;
+
+            label1.Text = Convert.ToString(e.Location.X);
+            check_click = true;
+        }
+
+
+            //зумм графика + ресет
+            private void chart2_MouseWheel(object sender, MouseEventArgs e)
         {
             var chart = (Chart)sender;
             var xAxis = chart.ChartAreas[0].AxisX;
@@ -239,10 +276,10 @@ namespace Kursovik
                     var yMax = yAxis.ScaleView.ViewMaximum;
 
                     //находим новые координаты для осей (с учетом положения курсора (куда наведешь - туда и зазумишь))
-                    var posXStart = Math.Round(xAxis.PixelPositionToValue(e.Location.X) - (xMax - xMin) / 2, 2);
-                    var posXFinish = Math.Round(xAxis.PixelPositionToValue(e.Location.X) + (xMax - xMin) / 2, 2);
-                    var posYStart = Math.Round(yAxis.PixelPositionToValue(e.Location.Y) - (yMax - yMin) / 2, 2);
-                    var posYFinish = Math.Round(yAxis.PixelPositionToValue(e.Location.Y) + (yMax - yMin) / 2, 2);
+                    var posXStart = Math.Round(xAxis.PixelPositionToValue(e.Location.X) - (xMax - xMin) / 2, 0);
+                    var posXFinish = Math.Round(xAxis.PixelPositionToValue(e.Location.X) + (xMax - xMin) / 2, 0);
+                    var posYStart = Math.Round(yAxis.PixelPositionToValue(e.Location.Y) - (yMax - yMin) / 2, 0);
+                    var posYFinish = Math.Round(yAxis.PixelPositionToValue(e.Location.Y) + (yMax - yMin) / 2, 0);
 
                     //зум
                     xAxis.ScaleView.Zoom(posXStart, posXFinish);
