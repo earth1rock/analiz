@@ -172,28 +172,25 @@ namespace Kursovik
 
 
                 //рисование графика
-                double[] testoviedataX = new double[countFirst];
-                double[] testoviedataY = new double[countFirst];
-
-                chart2.Series["Series1"].ChartType = SeriesChartType.Point;
-                chart2.Series.Add("line");
-                chart2.Series["line"].ChartType = SeriesChartType.Line;
-                for (int i = 0; i < countFirst; i++)
-                {
-                    testoviedataX[i] = Convert.ToDouble(dataGridView1.Rows[i].Cells[0].Value);
-                    testoviedataY[i] = Convert.ToDouble(dataGridView1.Rows[i].Cells[1].Value);
-                    label1.Text += Convert.ToString(testoviedataX[i]) + "  " + Convert.ToString(testoviedataY[i]) + "\r\n";                    
-                    chart2.Series["Series1"].Points.AddXY(testoviedataX[i],testoviedataY[i]);                   
-              
-                }
-
+                double[] X = new double[countFirst];
+                double[] Y = new double[countFirst];
 
                 //поиск коэфф регрессии
-                double b = Math.Round((countFirst * sumXY - sumX * sumY) / (countFirst * sumX2 - sumX * sumX), 2);
-                label1.Text = Convert.ToString(b) + "\r\n";
+                double k = Math.Round((countFirst * sumXY - sumX * sumY) / (countFirst * sumX2 - sumX * sumX), 2);
+                double b = Math.Round(avgY - k * avgX, 2);
 
-                double a = Math.Round(avgY - b * avgX, 2);
-                label1.Text += Convert.ToString(a);
+
+                for (int i = 0; i < countFirst; i++)
+                {
+                    //парсим значения Х и У
+                    X[i] = Convert.ToDouble(dataGridView1.Rows[i].Cells[0].Value);
+                    Y[i] = Convert.ToDouble(dataGridView1.Rows[i].Cells[1].Value);
+                  
+                    //добавляем точки и линию на график
+                    chart2.Series["Series1"].Points.AddXY(X[i],Y[i]);
+                    chart2.Series["line"].Points.AddXY(X[i], k*X[i]+b);          
+                }
+
             }
         }
         private void Form1_Load(object sender, EventArgs e)
@@ -204,6 +201,13 @@ namespace Kursovik
             dt.Columns.Add("y2");
             dt.Columns.Add("xy");
             dataGridView1.DataSource = dt;
+
+            //выбираем тип диаграммы точечный
+            chart2.Series["Series1"].ChartType = SeriesChartType.Point;
+
+            //выбираем тип диаграммы линейный
+            chart2.Series.Add("line");
+            chart2.Series["line"].ChartType = SeriesChartType.Line;
         }
 
         private void выходToolStripMenuItem_Click(object sender, EventArgs e)
@@ -213,7 +217,15 @@ namespace Kursovik
 
         private void открытьToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //очистка таблицы
             dt.Clear();
+            
+            //очистка графика
+            foreach (var series in chart2.Series)
+            {
+                series.Points.Clear();
+            }
+
             OpenFileDialog file = new OpenFileDialog();
             if (file.ShowDialog() == DialogResult.OK)
             {
