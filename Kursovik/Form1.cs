@@ -192,7 +192,6 @@ namespace Kursovik
                     chart2.Series["Series1"].Points.AddXY(X[i],Y[i]);
                     chart2.Series["line"].Points.AddXY(X[i], k*X[i]+b);          
                 }
-
             }
         }
         private void Form1_Load(object sender, EventArgs e)
@@ -214,82 +213,7 @@ namespace Kursovik
             //разрешение зума
             chart2.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
             chart2.ChartAreas[0].AxisY.ScaleView.Zoomable = true;
-            //связывание обработчика для зума
-            chart2.MouseWheel += chart2_MouseWheel;
-
-            //зачинки для перемещения скроллов
-            chart2.MouseDown += chart2_MouseDown;
-            chart2.MouseMove += Chart2_MouseMove;
-            chart2.MouseUp += Chart2_MouseUp;
-        }
-
-        private void Chart2_MouseUp(object sender, MouseEventArgs e)
-        {
-            check_click = false;
-        }
-
-        private void Chart2_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (check_click)
-            {
-                var chart = (Chart)sender;
-                var xAxis = chart.ChartAreas[0].AxisX;
-                var yAxis = chart.ChartAreas[0].AxisY;
-
-                label1.Text = Convert.ToString(e.Location.X) + "  " + Convert.ToString(chart.Width);
-                
-              //  xAxis.ScaleView.Scroll()
-            }
-        }
-
-        private void chart2_MouseDown(object sender, MouseEventArgs e)
-        {
-            var chart = (Chart)sender;
-            var xAxis = chart.ChartAreas[0].AxisX;
-            var yAxis = chart.ChartAreas[0].AxisY;
-
-            label1.Text = Convert.ToString(e.Location.X);
-            check_click = true;
-        }
-
-
-            //зумм графика + ресет
-            private void chart2_MouseWheel(object sender, MouseEventArgs e)
-        {
-            var chart = (Chart)sender;
-            var xAxis = chart.ChartAreas[0].AxisX;
-            var yAxis = chart.ChartAreas[0].AxisY;
-
-            try
-            {
-                if (e.Delta < 0) // Если скролим вниз, то сбрасываем зум
-                {
-                    xAxis.ScaleView.ZoomReset();
-                    yAxis.ScaleView.ZoomReset();
-                }
-                else if (e.Delta > 0) // Если скролим вверх, то зумим
-                {
-                    //получаем координаты начала и конца осей
-                    var xMin = xAxis.ScaleView.ViewMinimum;
-                    var xMax = xAxis.ScaleView.ViewMaximum;
-                    var yMin = yAxis.ScaleView.ViewMinimum;
-                    var yMax = yAxis.ScaleView.ViewMaximum;
-
-                    //находим новые координаты для осей (с учетом положения курсора (куда наведешь - туда и зазумишь))
-                    var posXStart = Math.Round(xAxis.PixelPositionToValue(e.Location.X) - (xMax - xMin) / 2, 0);
-                    var posXFinish = Math.Round(xAxis.PixelPositionToValue(e.Location.X) + (xMax - xMin) / 2, 0);
-                    var posYStart = Math.Round(yAxis.PixelPositionToValue(e.Location.Y) - (yMax - yMin) / 2, 0);
-                    var posYFinish = Math.Round(yAxis.PixelPositionToValue(e.Location.Y) + (yMax - yMin) / 2, 0);
-
-                    //зум
-                    xAxis.ScaleView.Zoom(posXStart, posXFinish);
-                    yAxis.ScaleView.Zoom(posYStart, posYFinish);
-                    
-                }
-            }
-            //пустышка катч
-            catch { }
-        }
+        }       
 
         private void выходToolStripMenuItem_Click(object sender, EventArgs e)
         {
