@@ -210,9 +210,6 @@ namespace Kursovik
             chart2.Series.Add("line");
             chart2.Series["line"].ChartType = SeriesChartType.Line;
 
-            //разрешение зума
-            chart2.ChartAreas[0].AxisX.ScaleView.Zoomable = true;
-            chart2.ChartAreas[0].AxisY.ScaleView.Zoomable = true;
         }       
 
         private void выходToolStripMenuItem_Click(object sender, EventArgs e)
