@@ -28,3 +28,13 @@ C:\Users\Alexander\Source\Repos\earth1rock\analiz\Kursovik\obj\Debug\Kursovik.cs
 C:\Users\Alexander\Source\Repos\earth1rock\analiz\Kursovik\obj\Debug\Kursovik.csproj.CoreCompileInputs.cache
 C:\Users\Alexander\Source\Repos\earth1rock\analiz\Kursovik\obj\Debug\Kursovik.exe
 C:\Users\Alexander\Source\Repos\earth1rock\analiz\Kursovik\obj\Debug\Kursovik.pdb
+C:\Users\YooWMooY\Desktop\analiz-master\Kursovik\bin\Debug\Kursovik.exe.config
+C:\Users\YooWMooY\Desktop\analiz-master\Kursovik\bin\Debug\Kursovik.exe
+C:\Users\YooWMooY\Desktop\analiz-master\Kursovik\bin\Debug\Kursovik.pdb
+C:\Users\YooWMooY\Desktop\analiz-master\Kursovik\obj\Debug\Kursovik.csprojAssemblyReference.cache
+C:\Users\YooWMooY\Desktop\analiz-master\Kursovik\obj\Debug\Kursovik.Form1.resources
+C:\Users\YooWMooY\Desktop\analiz-master\Kursovik\obj\Debug\Kursovik.Properties.Resources.resources
+C:\Users\YooWMooY\Desktop\analiz-master\Kursovik\obj\Debug\Kursovik.csproj.GenerateResource.cache
+C:\Users\YooWMooY\Desktop\analiz-master\Kursovik\obj\Debug\Kursovik.csproj.CoreCompileInputs.cache
+C:\Users\YooWMooY\Desktop\analiz-master\Kursovik\obj\Debug\Kursovik.exe
+C:\Users\YooWMooY\Desktop\analiz-master\Kursovik\obj\Debug\Kursovik.pdb

@@ -203,12 +203,18 @@ namespace Kursovik
                         //если выбрана линейная ф-я
                         if (typeChart == 0) chart2.Series["line"].Points.AddXY(X[i], k * X[i] + b);
 
+                        //степенная
+                        if (typeChart == 1) chart2.Series["line"].Points.AddXY(X[i], b * Math.Pow(X[i],k) );
+
                         //если выбрана гипербола
                         if (typeChart == 2)
                         {
                             chart2.Series["line"].ChartType = SeriesChartType.Spline;
                             chart2.Series["line"].Points.AddXY(X[i], b + k * (1 / X[i]) );
                         }
+                        //показательная
+                        if (typeChart == 3) chart2.Series["line"].Points.AddXY(X[i], b*Math.Pow(k,X[i]));
+
                         //если выбрана логарифмическая ф-я
                         if (typeChart == 4) chart2.Series["line"].Points.AddXY(X[i], b + k*Math.Log(X[i]));
 
@@ -217,8 +223,12 @@ namespace Kursovik
                     //если выбрана линейная ф-я
                     if (typeChart == 0) chart2.Series["line"].LegendText = "y=" + k + "*X+" + b;
 
+                    //степенная
+                    if (typeChart == 1) chart2.Series["line"].LegendText = "y=" + k + "*" + b + "^x";
                     //если выбрана гипербола
                     if (typeChart == 2) chart2.Series["line"].LegendText = "y=" + b + "+" + k + "*(1/X)";
+                    //показательная
+                    if (typeChart == 3) chart2.Series["line"].LegendText = "y=" + b + "*" + k + "^x";
 
                     //если выбрана логарифмическая ф-я
                     if (typeChart == 4) chart2.Series["line"].LegendText = "y="+b+"+"+k+"*Ln(x)";
@@ -298,6 +308,40 @@ namespace Kursovik
                 countFirst = dataGridView1.Rows.Count;
                 checkError();
             }      
+        }
+
+        private void экспортToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (countFirst != 0)
+            {
+                Stream stream;
+                saveFileDialog1.Filter = "txt files (*.txt)|*.txt|CSV files (*.csv)|*.csv|All files (*.*)|*.*";
+                if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    if ((stream = saveFileDialog1.OpenFile()) != null)
+                    {
+                        StreamWriter streamWriter = new StreamWriter(stream, System.Text.Encoding.Default);
+                        try
+                        {
+                            for (int i = 0; i < dataGridView1.Rows.Count - 1; i++)
+                            {
+                                for (int j = 0; j < dataGridView1.ColumnCount; j++)
+                                {
+                                    streamWriter.Write(dataGridView1.Rows[i].Cells[j].Value.ToString() + ";");
+                                }
+                                streamWriter.WriteLine();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                        }
+                        streamWriter.Close();
+                        stream.Close();
+
+                    }
+                }
+            }
         }
     }
 }
