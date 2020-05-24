@@ -38,3 +38,13 @@ C:\Users\YooWMooY\Desktop\analiz-master\Kursovik\obj\Debug\Kursovik.csproj.Gener
 C:\Users\YooWMooY\Desktop\analiz-master\Kursovik\obj\Debug\Kursovik.csproj.CoreCompileInputs.cache
 C:\Users\YooWMooY\Desktop\analiz-master\Kursovik\obj\Debug\Kursovik.exe
 C:\Users\YooWMooY\Desktop\analiz-master\Kursovik\obj\Debug\Kursovik.pdb
+C:\Users\YooWMooY\analiz\Kursovik\bin\Debug\Kursovik.exe.config
+C:\Users\YooWMooY\analiz\Kursovik\bin\Debug\Kursovik.exe
+C:\Users\YooWMooY\analiz\Kursovik\bin\Debug\Kursovik.pdb
+C:\Users\YooWMooY\analiz\Kursovik\obj\Debug\Kursovik.csprojAssemblyReference.cache
+C:\Users\YooWMooY\analiz\Kursovik\obj\Debug\Kursovik.Form1.resources
+C:\Users\YooWMooY\analiz\Kursovik\obj\Debug\Kursovik.Properties.Resources.resources
+C:\Users\YooWMooY\analiz\Kursovik\obj\Debug\Kursovik.csproj.GenerateResource.cache
+C:\Users\YooWMooY\analiz\Kursovik\obj\Debug\Kursovik.csproj.CoreCompileInputs.cache
+C:\Users\YooWMooY\analiz\Kursovik\obj\Debug\Kursovik.exe
+C:\Users\YooWMooY\analiz\Kursovik\obj\Debug\Kursovik.pdb

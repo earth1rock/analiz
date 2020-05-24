@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Diagnostics;
 
 namespace Kursovik
 {
@@ -316,6 +317,7 @@ namespace Kursovik
             {
                 Stream stream;
                 saveFileDialog1.Filter = "txt files (*.txt)|*.txt|CSV files (*.csv)|*.csv|All files (*.*)|*.*";
+                saveFileDialog1.FileName = "";
                 if (saveFileDialog1.ShowDialog() == DialogResult.OK)
                 {
                     if ((stream = saveFileDialog1.OpenFile()) != null)
@@ -336,6 +338,7 @@ namespace Kursovik
                         {
                             MessageBox.Show(ex.Message);
                         }
+                        
                         streamWriter.Close();
                         stream.Close();
 
@@ -343,5 +346,26 @@ namespace Kursovik
                 }
             }
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (chart2.Series != null)
+            {
+                saveFileDialog2.Filter = "JPG files (*.jpg)|*.jpg|PNG files (*.png)|*.png";
+                if (saveFileDialog2.ShowDialog() == DialogResult.OK)
+                {
+                    string path = saveFileDialog2.FileName;
+                    switch (saveFileDialog2.FilterIndex)
+                    {
+                        case 1: chart2.SaveImage(path, System.Windows.Forms.DataVisualization.Charting.ChartImageFormat.Jpeg); break;
+                        case 2: chart2.SaveImage(path, System.Windows.Forms.DataVisualization.Charting.ChartImageFormat.Png);break;
+                    }
+
+                
+                }
+                saveFileDialog2.FileName = "";
+            }
+        }
+        
     }
 }
