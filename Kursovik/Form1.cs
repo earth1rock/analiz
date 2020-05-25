@@ -11,6 +11,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Diagnostics;
+using Word = Microsoft.Office.Interop.Word;
 
 namespace Kursovik
 {
@@ -20,6 +21,9 @@ namespace Kursovik
         Boolean check_click = false;
         int countFirst = 0;
         int typeChart = 0;
+
+        private Word.Paragraphs wordparagraphs;
+        private Word.Paragraph wordparagraph;
         public Form1()
         {
             InitializeComponent();
@@ -104,7 +108,7 @@ namespace Kursovik
 
                     //добавление строки с суммами
                     dt.Rows.Add(sumX, sumY, sumX2, sumY2, sumXY);
-                    dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Σ";
+                    dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Сумма";
 
                     //добавление строки с средними величинами
                     double avgX = Math.Round(sumX / countFirst, 2),
@@ -325,11 +329,19 @@ namespace Kursovik
                         StreamWriter streamWriter = new StreamWriter(stream, System.Text.Encoding.Default);
                         try
                         {
+                            streamWriter.Write(";\t");
+                            for (int i=0;i<dt.Columns.Count;i++)
+                            {
+                                streamWriter.Write(Convert.ToString(dt.Columns[i].ColumnName)+";\t");
+                            }
+                            streamWriter.WriteLine();
+
                             for (int i = 0; i < dataGridView1.Rows.Count - 1; i++)
                             {
+                                streamWriter.Write(Convert.ToString(dataGridView1.Rows[i].HeaderCell.Value).Replace("\r\n"," ")+ ";\t");
                                 for (int j = 0; j < dataGridView1.ColumnCount; j++)
                                 {
-                                    streamWriter.Write(dataGridView1.Rows[i].Cells[j].Value.ToString() + ";");
+                                   streamWriter.Write(dataGridView1.Rows[i].Cells[j].Value.ToString() + ";\t");
                                 }
                                 streamWriter.WriteLine();
                             }
@@ -366,6 +378,120 @@ namespace Kursovik
                 saveFileDialog2.FileName = "";
             }
         }
-        
+
+        public void Export_Data_To_Word(DataGridView DGV, string filename)
+        {
+            if (DGV.Rows.Count != 0)
+            {
+             
+                int RowCount = DGV.Rows.Count;
+                int ColumnCount = DGV.Columns.Count+1;
+                Object[,] DataArray = new object[RowCount, ColumnCount];
+
+                //заполняем массив
+                int r = 0;
+                for (int c = 1; c <= ColumnCount - 1; c++)
+                {
+                    for (r = 0; r <= RowCount - 1; r++)
+                    {
+                        DataArray[r, c] = DGV.Rows[r].Cells[c-1].Value;
+                    }
+                } 
+
+                //создаем объект
+                Word.Document oDoc = new Word.Document();
+
+                //открытие приложения ворда
+                oDoc.Application.Visible = true;
+
+                //выбираем ориентацию страницы
+                oDoc.PageSetup.Orientation = Word.WdOrientation.wdOrientPortrait;
+                dynamic oRange = oDoc.Content.Application.Selection.Range;
+               
+                string oTemp = "";
+               
+                for (r = 0; r <= RowCount - 1; r++)
+                {
+                    for (int c = 0; c <= ColumnCount - 1; c++)
+                    {
+                        oTemp = oTemp + DataArray[r, c] + "\t";
+
+                    }
+                }
+
+                //протабулированный текст
+                oRange.Text = oTemp;
+                //указываем тип разделителя - ТАБ'ы
+                object Separator = Word.WdTableFieldSeparator.wdSeparateByTabs;
+                object ApplyBorders = true;
+                object AutoFit = true;
+                object AutoFitBehavior = Word.WdAutoFitBehavior.wdAutoFitContent;
+
+                //преобразует текст  в таблицу
+                oRange.ConvertToTable(ref Separator, ref RowCount, ref ColumnCount,
+                                      Type.Missing, Type.Missing, ref ApplyBorders,
+                                      Type.Missing, Type.Missing, Type.Missing,
+                                      Type.Missing, Type.Missing, Type.Missing,
+                                      Type.Missing, ref AutoFit, ref AutoFitBehavior, Type.Missing);
+
+                oRange.Select();
+
+                oDoc.Application.Selection.Tables[1].Select();
+
+                //настройки шрифта для таблицы
+                oDoc.Application.Selection.Tables[1].Range.Font.Name = "Times New Roman";
+                oDoc.Application.Selection.Tables[1].Range.Font.Size = 14;
+
+                //добавляем обводку таблицы
+                oDoc.Application.Selection.Tables[1].Borders.InsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
+                oDoc.Application.Selection.Tables[1].Borders.OutsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
+
+               //текст не может быть разделен по разрыву страницы
+                oDoc.Application.Selection.Tables[1].Rows.AllowBreakAcrossPages = 0;
+                //выравнивание по левому краю
+                oDoc.Application.Selection.Tables[1].Rows.Alignment = 0;
+
+                oDoc.Application.Selection.Tables[1].Rows[1].Select();
+
+                //отступ после заголовков столбца в строках
+                oDoc.Application.Selection.InsertRowsAbove(1);
+                oDoc.Application.Selection.Tables[1].Rows[1].Select();
+
+                //стиль строк заголовка
+                //полужирный 
+                oDoc.Application.Selection.Tables[1].Rows[1].Range.Bold = 1;
+
+                //добавляем заголовки столбцов
+                for (int c = 0; c <= ColumnCount - 2; c++)
+                {
+                    oDoc.Application.Selection.Tables[1].Cell(1, c + 2).Range.Text = DGV.Columns[c].HeaderText;
+                }
+
+                //добавляем заголовки строк
+                for (int c = 0; c <= RowCount - 1; c++)
+                {
+                    oDoc.Application.Selection.Tables[1].Cell(c + 2, 0).Range.Text = DGV.Rows[c].HeaderCell.Value.ToString();
+                }
+
+                //сохранение
+                oDoc.SaveAs2(filename);
+
+            }
+        }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+
+            sfd.Filter = "Word Documents (*.docx)|*.docx";
+
+            sfd.FileName = "export.docx";
+
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+
+                Export_Data_To_Word(dataGridView1, sfd.FileName);
+            }
+        }
     }
 }
