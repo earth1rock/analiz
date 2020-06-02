@@ -18,12 +18,8 @@ namespace Kursovik
     public partial class Form1 : Form
     {
         DataTable dt = new DataTable();
-        Boolean check_click = false;
         int countFirst = 0;
         int typeChart = 0;
-
-        private Word.Paragraphs wordparagraphs;
-        private Word.Paragraph wordparagraph;
         public Form1()
         {
             InitializeComponent();
@@ -33,7 +29,6 @@ namespace Kursovik
         //метод для обработки неправильно введенных данных
         private bool checkError()
         {
-
             for (int i = 0; i < countFirst; i++)
             {
                 //парсим x и y
@@ -55,7 +50,8 @@ namespace Kursovik
             return true;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        //метод вычисления + рисование графика
+        private void drawChart(int typeChartarg)
         {
             if (countFirst != 0)
             {
@@ -64,7 +60,7 @@ namespace Kursovik
                 {
                     series.Points.Clear();
                 }
-
+                //удаление строк
                 while (dataGridView1.Rows.Count > countFirst)
                 {
                     dataGridView1.Rows.RemoveAt(Convert.ToInt32(dataGridView1.Rows.Count - 1));
@@ -97,6 +93,7 @@ namespace Kursovik
                             sumY2 = 0,
                             sumXY = 0;
 
+                    //вычисления 
                     for (int i = 0; i < countFirst; i++)
                     {
                         sumX += Convert.ToDouble(dataGridView1.Rows[i].Cells[0].Value);
@@ -130,6 +127,7 @@ namespace Kursovik
                     string koefMsg = "",
                            koefZnak = "";
 
+                    //выводы о коэфф корреляции
                     if (koef_korr == 0)
                     {
                         koefMsg = "Связь отсутствует";
@@ -188,15 +186,103 @@ namespace Kursovik
                     dt.Rows.Add(vivod_korr);
                     dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = "Вывод \r\nо значимости коэффициента корреляции";
 
-                    //рисование графика
+                    //vvvvvvvvvvvvvvvvvvvvvvvvvv  РЕГРЕССИЯ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+                    //массивы точек
                     double[] X = new double[countFirst];
                     double[] Y = new double[countFirst];
 
-                    //поиск коэфф регрессии
-                    double k = Math.Round((countFirst * sumXY - sumX * sumY) / (countFirst * sumX2 - sumX * sumX), 4);
-                    double b = Math.Round(avgY - k * avgX, 2);
+                    //коэфф регрессии
+                    double k = 0;
+                    double b = 0;
 
+                    //рассчеты коэфф регрессии
+                    //если линейная y = kx+b
+                    if (typeChartarg == 0)
+                    {
+                        k = Math.Round((countFirst * sumXY - sumX * sumY) / (countFirst * sumX2 - sumX * sumX), 4);
+                        b = Math.Round(avgY - k * avgX, 2);
+                    }
+                    //если степенная y=a0*x^a1
+                    if (typeChartarg == 1)
+                    {
+                        //сумма ln x
+                        double sumlnx = 0;
+                        //сумма ln y
+                        double sumlny = 0;
+                        //сумма ln (x*y)
+                        double sumlnxy = 0;
+                        //сумма (lnx)^2
+                        double sumlnx2 = 0;
 
+                        //находим все суммы
+                        for (int i = 0; i < countFirst; i++)
+                        {
+                            //парсим значения Х и У
+                            X[i] = Convert.ToDouble(dataGridView1.Rows[i].Cells[0].Value);
+                            Y[i] = Convert.ToDouble(dataGridView1.Rows[i].Cells[1].Value);
+
+                            sumlnx += Math.Log(X[i]);
+                            sumlny += Math.Log(Y[i]);
+                            sumlnxy += Math.Log(X[i]) * Math.Log(Y[i]);
+                            sumlnx2 += Math.Log(X[i]) * Math.Log(X[i]);
+                        }
+                        //a1
+                        k = Math.Round((countFirst * sumlnxy - sumlnx * sumlny) / (countFirst * sumlnx2 - sumlnx * sumlnx), 2);
+                        //a0
+                        b = Math.Exp((1 / (double)countFirst * sumlny) - (1 / (double)countFirst * k * sumlnx));
+                    }
+                    //если гипербола y = a0 + a1/x
+                    if (typeChartarg == 2)
+                    {
+                        //сумма y/x
+                        double sumyx = 0;
+                        //сумма 1/x
+                        double sum1x = 0;
+                        //сумма 1/x2
+                        double sumx1x2 = 0;
+                        //находим все суммы
+                        for (int i = 0; i < countFirst; i++)
+                        {
+                            //парсим значения Х и У
+                            X[i] = Convert.ToDouble(dataGridView1.Rows[i].Cells[0].Value);
+                            Y[i] = Convert.ToDouble(dataGridView1.Rows[i].Cells[1].Value);
+
+                            sumyx += Y[i] / X[i];
+                            sum1x += 1 / X[i];
+                            sumx1x2 += 1 / (X[i]*X[i]);
+                        }
+                        //a1
+                        k = ((double)countFirst*sumyx - sum1x*sumY) / ((double)countFirst*sumx1x2 - sum1x*sum1x);
+                        //a0
+                        b = (1/(double)countFirst * sumY) - (1/(double)countFirst*k*sum1x);
+                    }
+                    //если степенная (экспоненциальная)
+                    if (typeChartarg == 3)
+                    {
+                        //сумма x*ln y
+                        double sumxlny = 0;
+                        //сумма ln y
+                        double sumlny = 0;
+
+                        //находим все суммы
+                        for (int i = 0; i < countFirst; i++)
+                        {
+                            //парсим значения Х и У
+                            X[i] = Convert.ToDouble(dataGridView1.Rows[i].Cells[0].Value);
+                            Y[i] = Convert.ToDouble(dataGridView1.Rows[i].Cells[1].Value);
+
+                            sumxlny += X[i] * Math.Log(Y[i]);
+                            sumlny += Math.Log(Y[i]);
+
+                        }
+                        //a1
+                        k = Math.Exp(((double)countFirst*sumxlny-sumX*sumlny) / ((double)countFirst*sumX2-sumX*sumX));
+                        //a0
+                        b = Math.Exp((1/(double)countFirst*sumlny) - (1/(double)countFirst*Math.Log(k)*sumX));
+                    }
+
+                    //рисование графика
                     for (int i = 0; i < countFirst; i++)
                     {
                         //парсим значения Х и У
@@ -205,41 +291,51 @@ namespace Kursovik
 
                         //добавляем точки и линию на график
                         chart2.Series["Series1"].Points.AddXY(X[i], Y[i]);
+
                         //если выбрана линейная ф-я
-                        if (typeChart == 0) chart2.Series["line"].Points.AddXY(X[i], k * X[i] + b);
-
+                        if (typeChartarg == 0)
+                        {
+                            chart2.Series["line"].ChartType = SeriesChartType.Line;
+                            chart2.Series["line"].Points.AddXY(X[i], k * X[i] + b);
+                        }
                         //степенная
-                        if (typeChart == 1) chart2.Series["line"].Points.AddXY(X[i], b * Math.Pow(X[i],k) );
-
-                        //если выбрана гипербола
-                        if (typeChart == 2)
+                        if (typeChartarg == 1)
                         {
                             chart2.Series["line"].ChartType = SeriesChartType.Spline;
-                            chart2.Series["line"].Points.AddXY(X[i], b + k * (1 / X[i]) );
+                            chart2.Series["line"].Points.AddXY(X[i], b * Math.Pow(X[i], k));
+                        }
+                        //если выбрана гипербола
+                        if (typeChartarg == 2)
+                        {
+                            chart2.Series["line"].ChartType = SeriesChartType.Spline;
+                            chart2.Series["line"].Points.AddXY(X[i], b + k * (1 / X[i]));
                         }
                         //показательная
-                        if (typeChart == 3) chart2.Series["line"].Points.AddXY(X[i], b*Math.Pow(k,X[i]));
-
-                        //если выбрана логарифмическая ф-я
-                        if (typeChart == 4) chart2.Series["line"].Points.AddXY(X[i], b + k*Math.Log(X[i]));
-
-
+                        if (typeChartarg == 3)
+                        {
+                            chart2.Series["line"].ChartType = SeriesChartType.Spline;
+                            chart2.Series["line"].Points.AddXY(X[i], b * Math.Pow(k, X[i]));
+                        }
                     }
+
+                    //подпись уравнения на графике (легенда)
                     //если выбрана линейная ф-я
-                    if (typeChart == 0) chart2.Series["line"].LegendText = "y=" + k + "*X+" + b;
-
+                    if (typeChartarg == 0) chart2.Series["line"].LegendText = "y=" + k + "*X+" + b;
                     //степенная
-                    if (typeChart == 1) chart2.Series["line"].LegendText = "y=" + k + "*" + b + "^x";
+                    if (typeChartarg == 1) chart2.Series["line"].LegendText = "y=" + Math.Round(b, 2) + "*x^" + k;
                     //если выбрана гипербола
-                    if (typeChart == 2) chart2.Series["line"].LegendText = "y=" + b + "+" + k + "*(1/X)";
+                    if (typeChartarg == 2) chart2.Series["line"].LegendText = "y=" + Math.Round(b, 2) + "+" + Math.Round(k, 2) + "*(1/X)";
                     //показательная
-                    if (typeChart == 3) chart2.Series["line"].LegendText = "y=" + b + "*" + k + "^x";
+                    if (typeChartarg == 3) chart2.Series["line"].LegendText = "y=" + Math.Round(b, 2) + "*" + Math.Round(k, 2) + "^x";
 
-                    //если выбрана логарифмическая ф-я
-                    if (typeChart == 4) chart2.Series["line"].LegendText = "y="+b+"+"+k+"*Ln(x)";
-
+                    //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ РЕГРЕССИЯ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
                 }
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            drawChart(typeChart);
         }
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -260,8 +356,6 @@ namespace Kursovik
             //выбор значения по умолчанию
             comboBox1.SelectedItem = "Линейная ф-я";
             comboBox1.SelectedIndexChanged += ComboBox1_SelectedIndexChanged;
-
-
         }
 
         private void ComboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -279,7 +373,7 @@ namespace Kursovik
         {
             //очистка таблицы
             dt.Clear();
-           
+          
             //очистка графика
             foreach (var series in chart2.Series)
             {
@@ -287,6 +381,10 @@ namespace Kursovik
             }
 
             OpenFileDialog file = new OpenFileDialog();
+
+            file.Filter = "CSV files (*.csv)|*.csv";
+            file.FileName = "";
+
             if (file.ShowDialog() == DialogResult.OK)
             {
                 textBox1.Text = file.FileName;
@@ -359,6 +457,7 @@ namespace Kursovik
             }
         }
 
+        //экспорт графика
         private void button3_Click(object sender, EventArgs e)
         {
             if (chart2.Series != null)
@@ -378,7 +477,7 @@ namespace Kursovik
                 saveFileDialog2.FileName = "";
             }
         }
-
+        //метод экспорта в docx
         public void Export_Data_To_Word(DataGridView DGV, string filename)
         {
             if (DGV.Rows.Count != 0)
@@ -405,9 +504,9 @@ namespace Kursovik
                 oDoc.Application.Visible = true;
 
                 //выбираем ориентацию страницы
-                oDoc.PageSetup.Orientation = Word.WdOrientation.wdOrientPortrait;
+                oDoc.PageSetup.Orientation = Word.WdOrientation.wdOrientPortrait;  
                 dynamic oRange = oDoc.Content.Application.Selection.Range;
-               
+                
                 string oTemp = "";
                
                 for (r = 0; r <= RowCount - 1; r++)
@@ -478,7 +577,7 @@ namespace Kursovik
 
             }
         }
-
+        //кнопка экспорт в docx
         private void button2_Click_1(object sender, EventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
