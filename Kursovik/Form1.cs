@@ -301,19 +301,19 @@ namespace Kursovik
                         //степенная
                         if (typeChartarg == 1)
                         {
-                            chart2.Series["line"].ChartType = SeriesChartType.Spline;
+                            chart2.Series["line"].ChartType = SeriesChartType.Point;
                             chart2.Series["line"].Points.AddXY(X[i], b * Math.Pow(X[i], k));
                         }
                         //если выбрана гипербола
                         if (typeChartarg == 2)
                         {
-                            chart2.Series["line"].ChartType = SeriesChartType.Spline;
+                            chart2.Series["line"].ChartType = SeriesChartType.Point;
                             chart2.Series["line"].Points.AddXY(X[i], b + k * (1 / X[i]));
                         }
                         //показательная
                         if (typeChartarg == 3)
                         {
-                            chart2.Series["line"].ChartType = SeriesChartType.Spline;
+                            chart2.Series["line"].ChartType = SeriesChartType.Point;
                             chart2.Series["line"].Points.AddXY(X[i], b * Math.Pow(k, X[i]));
                         }
                     }
