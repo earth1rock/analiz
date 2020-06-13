@@ -382,8 +382,6 @@ namespace Kursovik
             //очистка таблицы
             dt.Clear();
 
-            //разрешаем экспорт
-            allow_to_export = true;
 
             //очистка графика
             foreach (var series in chart2.Series)
@@ -407,6 +405,14 @@ namespace Kursovik
                 for (int i = 0; i < lines.Length; i++)
                 {
                     values = lines[i].ToString().Split(';');
+
+                    if (values.Length != 2) 
+                    {
+                        MessageBox.Show("Проверьте формат входных данных! Он должен быть в формате X;Y ");
+                        allow_to_export = false;
+                        return;
+                    }
+
                     string[] row = new string[values.Length];
 
                     for (int j = 0; j < values.Length; j++)
@@ -414,9 +420,22 @@ namespace Kursovik
                         row[j] = values[j].Trim();
                     }
 
-                    dt.Rows.Add(row);
-                    dataGridView1.Rows[dataGridView1.Rows.Count-1].HeaderCell.Value = Convert.ToString(i+1);
+                    try
+                    {
+                        dt.Rows.Add(row);
+                        dataGridView1.Rows[dataGridView1.Rows.Count - 1].HeaderCell.Value = Convert.ToString(i + 1);
+                    }
+                    catch (System.ArgumentException err)
+                    {
+                        MessageBox.Show(Convert.ToString(err) + "  " + values.Length + " " + Convert.ToString(values[1]));
+                        allow_to_export = false;
+                        return;
+                    }
+
                 }
+
+                //разрешаем экспорт
+                allow_to_export = true;
 
                 //количество исходных данных
                 countFirst = dataGridView1.Rows.Count;
